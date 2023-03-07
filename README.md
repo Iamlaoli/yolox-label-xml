@@ -18,7 +18,7 @@
 
 8. demo 中 def make_parser() 参数可根据实际情况调试；
 
-本项目基于yolox推理进行修改仿照yolov5-label-xml-main进行编写；
+本项目基于yolox推理进行修改,仿照yolov5-label-xml-main进行编写；
 
 
 
