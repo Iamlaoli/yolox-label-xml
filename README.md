@@ -1,14 +1,14 @@
 # yolox-label-xml
 
-  ### 使用yolox实现的一个预标注程序
+### 使用yolox实现的一个预标注程序
 
-  1. 将预训练好的权重放入models/weights中，修改utils/config.py配置文件；
+1. 将预训练好的权重放入models/weights中，修改utils/config.py配置文件；
 
-  2. 在demo中配置需要标注的图片路径和要保存xml路径；
+2. 在demo中配置需要标注的图片路径和要保存xml路径；
 
-  3. 运行demo.py文件，结束后预标注的xml文件存放在inference/xmls中；
+3. 运行demo.py文件，结束后预标注的xml文件存放在inference/xmls中；
 
-  4. 使用labelimg进行微调；
+4. 使用labelimg进行微调；
 
   5.修改 exps\example\yolox_voc\yolox_voc.py类别个数；
 
