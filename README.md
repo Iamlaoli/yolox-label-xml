@@ -2,21 +2,23 @@
 
 ### 使用yolox实现的一个预标注程序
 
-1. 将预训练好的权重放入models/weights中，修改utils/config.py配置文件；
+1. 将预训练好的权重放入models/weights中，修改demo.py文件中的（.pth）--ckpt参数；
 
-2. 在demo中配置需要标注的图片路径和要保存xml路径；
+2. 在demo。py中配置需要标注的图片路径和要保存xml路径；
 
-3. 使用labelimg进行微调；
 
-4. 修改 exps\example\yolox_voc\yolox_voc.py类别个数；
 
-5. 修改 yolox\data\datasets\voc_classes.py 种类名称；
+3. 修改 exps\example\yolox_voc\yolox_voc.py类别个数；
 
-6. 修改 yolox\exp\yolox_base.py 类别个数；
+4. 修改 yolox\data\datasets\voc_classes.py 种类名称；
 
-7. demo.py 中 def make_parser() 参数可根据实际情况调试；
+5. 修改 yolox\exp\yolox_base.py 类别个数；
 
-8. 运行demo.py文件；
+6. demo.py 中 def make_parser() 参数可根据实际情况调试；
+
+7. 运行demo.py文件生成xml标签；
+
+8. 使用labelimg进行微调；
 
 本项目基于yolox推理进行修改,仿照yolov5-label-xml-main进行编写；
 
