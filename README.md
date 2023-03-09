@@ -6,8 +6,6 @@
 
 2. 在demo。py中配置需要标注的图片路径和要保存xml路径；
 
-
-
 3. 修改 exps\example\yolox_voc\yolox_voc.py类别个数；
 
 4. 修改 yolox\data\datasets\voc_classes.py 种类名称；
