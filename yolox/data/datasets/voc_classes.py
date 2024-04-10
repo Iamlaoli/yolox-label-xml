@@ -1,14 +1,63 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 # Copyright (c) Megvii, Inc. and its affiliates.
-
+# VOC_CLASSES=(
+#     "fight",
+#     "no_fight",
+#
+# )
+# VOC_CLASSES = ( 'phone',)
 # VOC_CLASSES = ( '__background__', # always index 0",
 # VOC_CLASSES=(
+#     "fire",
 #     "smoke"
 # )
+# VOC_CLASSES=(
+#     "smoking",
+# )
+# #行车
+# VOC_CLASSES=(
+#     "train_working",
+# # )
+# VOC_CLASSES=(
+#     "background",
+#     "background",
+# )
+
+# )
+# VOC_CLASSES=(
+#    "fire",
+#    "smoke",
+# )
+# VOC_CLASSES=(
+#    "other",
+# )
+# VOC_CLASSES=(
+#     "climb over",
+#     "other_hat",
+#     "smoke",
+#     "smoking",
+#     "No_hard_hat",
+#     "SafetyRope",
+#     "other_clothes",
+#     "phone",
+#     "fire",
+# )
 VOC_CLASSES=(
-    "fire",
+    "other",
+
 )
+# VOC_CLASSES=(
+#     "climb over",
+#     "orange_hat",
+#     "smoke",
+#     "smoking",
+#     "No_hard_hat",
+#     "other_clothes",
+#     "reflective_clothes",
+#     "phone",
+#     "fire",
+# )
 # VOC_CLASSES = (
 #     "person",
 #     "bicycle",
@@ -18,7 +67,7 @@ VOC_CLASSES=(
 #     "bus",
 #     "train",
 #     "truck",
-#     "boat",
+#     "shipSail",
 #     "traffic light",
 #     "fire hydrant",
 #     "stop sign",

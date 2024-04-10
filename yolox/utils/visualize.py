@@ -4,23 +4,23 @@
 
 import cv2
 import numpy as np
-import win32com.client as win
+# import win32com.client as win
 __all__ = ["vis"]
 
 def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None,classes=None):
     img_boxes_list=[]
+    # print(boxes)
     for i in range(len(boxes)):
         box = boxes[i]
         cls_id = int(cls_ids[i])
         score = scores[i]
         if score < conf:
-            continue
+            break
         x0 = int(box[0])
         y0 = int(box[1])
         x1 = int(box[2])
         y1 = int(box[3])
         if class_names[cls_id]  in classes:
-            # print("ididididididdididididididid",class_names[cls_id])
             color = (_COLORS[cls_id] * 255).astype(np.uint8).tolist()
             text = '{}:{:.1f}%'.format(class_names[cls_id], score * 100)
             txt_color = (0, 0, 0) if np.mean(_COLORS[cls_id]) > 0.5 else (255, 255, 255)
@@ -48,7 +48,11 @@ def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None,classes=None):
 
             # else:
             #     continue
-            img_boxes_list.append([str(x0),str(y0),str(x1),str(y1),str(class_names[cls_id])])
+            # print(class_names[cls_id])
+            img_boxes_list.append([str(int(x0*0.9)),str(int(y0*0.9)),str(int(x1*1.1)),str(int(y1*1.1)),str(class_names[cls_id])])
+            # img_boxes_list.append([str(x0),str(y0),str(x1),str(y1),str(class_names[cls_id])])
+        # else:
+        #     continue
     return img,img_boxes_list
 
 

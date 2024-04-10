@@ -4,7 +4,6 @@ import os
 from os import listdir, getcwd
 from os.path import join
 
-
 def convert(size, box):
     # size=(width, height)  b=(xmin, xmax, ymin, ymax)
     # x_center = (xmax+xmin)/2        y_center = (ymax+ymin)/2
