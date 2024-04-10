@@ -4,6 +4,7 @@ import inference
 from lxml.etree import Element, SubElement, tostring
 from yolox import exp
 import os
+from yolox.data.datasets import VOC_CLASSES
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Demo!")
     parser.add_argument(
@@ -27,7 +28,7 @@ def make_parser():
         type=str,
         help="please input your experiment description file",
     )
-    parser.add_argument("-c", "--ckpt", default="models/weights/best_ckpt.pth", type=str, help="ckpt for eval")#所用到的模型位置
+    parser.add_argument("-c", "--ckpt", default=r"D:\model\YOLOX-main\weights\x_s\best_ckpt_0105_fire_95.pth", type=str, help="ckpt for eval")#所用到的模型位置
     parser.add_argument(
         "--device",
         default="gpu",
@@ -35,7 +36,7 @@ def make_parser():
         help="device to run our model, can either be cpu or gpu",
     )
     parser.add_argument("--conf", default=0.3, type=float, help="test conf")
-    parser.add_argument("--nms", default=0.3, type=float, help="test nms threshold")
+    parser.add_argument("--nms", default=0.45, type=float, help="test nms threshold")
     parser.add_argument("--tsize", default=640, type=int, help="test img size")
     parser.add_argument(
         "--fp16",
@@ -67,7 +68,8 @@ def make_parser():
     )
     parser.add_argument(
         "--classes",
-        default=("fire",),#需要标注的类别
+        default=("other"),#需要标注的类别
+        # default=VOC_CLASSES,#需要标注的类别
         type=str,
         help="show classes",
     )
@@ -131,12 +133,13 @@ def create_xml(list_xml,list_images,xml_path):
 
 if __name__ == '__main__':
 
-
     args = make_parser().parse_args()
-    args.path = r"E:\datasets\fire\New_fire" #图片路径
-    xml_path = r"E:\datasets\fire\New_fire_xmls"# xml标注保存路径
-    args.conf=0.3
-    args.nms=0.3
+    args.path = r"D:\model\YOLOX-main\datasets\VOCdevkit\VOC2007\fire_wb\JPEGImages" #图片路径
+    xml_path = r"D:\model\YOLOX-main\datasets\VOCdevkit\VOC2007\fire_wb\Annotations"# xml标注保存路径
+    if not os.path.exists(xml_path):
+        os.makedirs(xml_path,exist_ok=True)
+    args.conf=0.5
+    args.nms=0.45
     args.tsize=640
     exp = exp.get_exp(args.exp_file, args.name)
     for name in os.listdir(args.path):
@@ -146,5 +149,12 @@ if __name__ == '__main__':
             list_image = (image.shape[0],image.shape[1],image.shape[2],name)             # 图片的宽高等信息
         except:
             continue
-        out_boxes= inference.main(exp, args,image)      # img0检测后的图像，img_crop裁剪的图像
-        create_xml(out_boxes,list_image,xml_path)          # 生成标注的xml文件
+        out_boxes= inference.main(exp, args,image)
+        if isinstance(out_boxes, list):
+            create_xml(out_boxes, list_image, xml_path)
+        else:
+            continue
+
+
+
+             # 生成标注的xml文件
