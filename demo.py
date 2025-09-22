@@ -4,11 +4,15 @@ import inference
 from lxml.etree import Element, SubElement, tostring
 from yolox import exp
 import os
+import threading
+import time
 from yolox.data.datasets import VOC_CLASSES
+
+
 def make_parser():
     parser = argparse.ArgumentParser("YOLOX Demo!")
     parser.add_argument(
-        "--demo",  help="demo type, eg. image, video and webcam"
+        "--demo", help="demo type, eg. image, video and webcam"
     )
     parser.add_argument("-expn", "--experiment-name", type=str, default=None)
     parser.add_argument("-n", "--name", type=str, default=None, help="model name")
@@ -21,14 +25,16 @@ def make_parser():
         help="whether to save the inference result of image/video",
     )
     # exp file
+
     parser.add_argument(
         "-f",
         "--exp_file",
-        default="./exps\example\yolox_voc\yolox_voc.py",
+        default="./exps\example\yolox_voc\yolox_voc_nano.py",
         type=str,
         help="please input your experiment description file",
     )
-    parser.add_argument("-c", "--ckpt", default=r"D:\model\YOLOX-main\weights\x_s\best_ckpt_0105_fire_95.pth", type=str, help="ckpt for eval")#所用到的模型位置
+    parser.add_argument("-c", "--ckpt", default=r"D:\model\YOLOX-main\YOLOX_outputs\yolox_voc_nano\WQ_wash_4000_best_ckpt.pth",
+                        type=str, help="ckpt for eval")  # 所用到的模型位置
     parser.add_argument(
         "--device",
         default="gpu",
@@ -68,13 +74,15 @@ def make_parser():
     )
     parser.add_argument(
         "--classes",
-        default=("other"),#需要标注的类别
-        # default=VOC_CLASSES,#需要标注的类别
+        # default=("person",),#需要标注的类别
+        default=VOC_CLASSES,  # 需要标注的类别
         type=str,
         help="show classes",
     )
     return parser
-def create_xml(list_xml,list_images,xml_path):
+
+
+def create_xml(list_xml, list_images, xml_path):
     """
     创建xml文件，依次写入xml文件必备关键字
     :param list_xml:   txt文件中的box
@@ -94,11 +102,12 @@ def create_xml(list_xml,list_images,xml_path):
     node_depth = SubElement(node_size, 'depth')
     node_depth.text = str(list_images[2])
 
-    if len(list_xml)>=1:        # 循环写入box
+    if len(list_xml) >= 1:  # 循环写入box
         for list_ in list_xml:
             node_object = SubElement(node_root, 'object')
             node_name = SubElement(node_object, 'name')
-            # if str(list_[4]) == "person":                # 根据条件筛选需要标注的标签,例如这里只标记person这类，不符合则直接跳过
+            # if str(list_[4]) == "person":   # 根据条件筛选需要标注的标签,例如这里只标记person这类，不符合则直接跳过
+            #     list_[4] = "sleep"
             #     node_name.text = str(list_[4])
             # else:
             #     continue
@@ -113,48 +122,144 @@ def create_xml(list_xml,list_images,xml_path):
             node_difficult.text = '0'
             node_bndbox = SubElement(node_object, 'bndbox')
             node_xmin = SubElement(node_bndbox, 'xmin')
+            # node_xmin.text = str(int(list_[0])-0.1*(int(list_[2])-int(list_[0])))
             node_xmin.text = str(list_[0])
             node_ymin = SubElement(node_bndbox, 'ymin')
             node_ymin.text = str(list_[1])
             node_xmax = SubElement(node_bndbox, 'xmax')
             node_xmax.text = str(list_[2])
+            # node_xmax.text = str(int(list_[2])+int(0.1*(int(list_[2])-int(list_[0]))))
             node_ymax = SubElement(node_bndbox, 'ymax')
             node_ymax.text = str(list_[3])
+            # node_ymax.text = str(int(list_[3])+int(0.2*(int(list_[3])-int(list_[1]))))
 
-    xml = tostring(node_root, pretty_print=True)   # 格式化显示，该换行的换行
+    xml = tostring(node_root, pretty_print=True)  # 格式化显示，该换行的换行
 
     file_name = list_images[3].split(".")[0]
-    filename = xml_path+"/{}.xml".format(file_name)
+    filename = xml_path + "/{}.xml".format(file_name)
 
     f = open(filename, "wb")
     f.write(xml)
     f.close()
 
 
-if __name__ == '__main__':
-
+def main1(name):
+    from yolox import exp
     args = make_parser().parse_args()
-    args.path = r"D:\model\YOLOX-main\datasets\VOCdevkit\VOC2007\fire_wb\JPEGImages" #图片路径
-    xml_path = r"D:\model\YOLOX-main\datasets\VOCdevkit\VOC2007\fire_wb\Annotations"# xml标注保存路径
+    args.path = r"D:\111_WQ\xishou\wash_20250922"  # 图片路径
+    xml_path = r"D:\111_WQ\xishou\wash_20250922_labels"  # xml标注保存路径
     if not os.path.exists(xml_path):
-        os.makedirs(xml_path,exist_ok=True)
-    args.conf=0.5
-    args.nms=0.45
-    args.tsize=640
+        os.makedirs(xml_path, exist_ok=True)
+    args.conf = 0.5
+    args.nms = 0.45
+    args.tsize = 416
     exp = exp.get_exp(args.exp_file, args.name)
     for name in os.listdir(args.path):
         print(name)
-        image = cv2.imread(os.path.join(args.path,name))
+        image = cv2.imread(os.path.join(args.path, name))
         try:
-            list_image = (image.shape[0],image.shape[1],image.shape[2],name)             # 图片的宽高等信息
+            list_image = (image.shape[0], image.shape[1], image.shape[2], name)  # 图片的宽高等信息
         except:
             continue
-        out_boxes= inference.main(exp, args,image)
+        out_boxes = inference.main(exp, args, image)
         if isinstance(out_boxes, list):
             create_xml(out_boxes, list_image, xml_path)
         else:
             continue
 
 
+def main2(name):
+    from yolox import exp
+    args = make_parser().parse_args()
+    args.path = r"D:\datasets\scale_4"  # 图片路径
+    xml_path = r"D:\datasets\scale_4_Annotations"  # xml标注保存路径
+    if not os.path.exists(xml_path):
+        os.makedirs(xml_path, exist_ok=True)
+    args.conf = 0.3
+    args.nms = 0.45
+    args.tsize = 416
+    exp = exp.get_exp(args.exp_file, args.name)
+    for name in os.listdir(args.path):
+        print(name)
+        image = cv2.imread(os.path.join(args.path, name))
+        try:
+            list_image = (image.shape[0], image.shape[1], image.shape[2], name)  # 图片的宽高等信息
+        except:
+            continue
+        out_boxes = inference.main(exp, args, image)
+        if isinstance(out_boxes, list):
+            create_xml(out_boxes, list_image, xml_path)
+        else:
+            continue
 
-             # 生成标注的xml文件
+
+def main3(name):
+    from yolox import exp
+    args = make_parser().parse_args()
+    args.path = r"D:\111_WQ\xishou\wash_20250922"  # 图片路径
+    xml_path = r"D:\111_WQ\xishou\wash_20250922_labels"  # xml标注保存路径
+    if not os.path.exists(xml_path):
+        os.makedirs(xml_path, exist_ok=True)
+    args.conf = 0.3
+    args.nms = 0.45
+    args.tsize = 640
+    exp = exp.get_exp(args.exp_file, args.name)
+    for name in os.listdir(args.path):
+        print(name)
+        image = cv2.imread(os.path.join(args.path, name))
+        try:
+            list_image = (image.shape[0], image.shape[1], image.shape[2], name)  # 图片的宽高等信息
+        except:
+            continue
+        out_boxes = inference.main(exp, args, image)
+        if isinstance(out_boxes, list):
+            create_xml(out_boxes, list_image, xml_path)
+        else:
+            continue
+
+
+def main4(name):
+    from yolox import exp
+    args = make_parser().parse_args()
+    args.path = r"D:\model\YOLOX-main\datasets\VOCdevkit\VOC2007\fire_wb\JPEGImages\4"  # 图片路径
+    xml_path = r"D:\model\YOLOX-main\datasets\VOCdevkit\VOC2007\fire_wb\Annotations\4"  # xml标注保存路径
+    if not os.path.exists(xml_path):
+        os.makedirs(xml_path, exist_ok=True)
+    args.conf = 0.5
+    args.nms = 0.45
+    args.tsize = 640
+    exp = exp.get_exp(args.exp_file, args.name)
+    for name in os.listdir(args.path):
+        print(name)
+        image = cv2.imread(os.path.join(args.path, name))
+        try:
+            list_image = (image.shape[0], image.shape[1], image.shape[2], name)  # 图片的宽高等信息
+        except:
+            continue
+        out_boxes = inference.main(exp, args, image)
+        if isinstance(out_boxes, list):
+            create_xml(out_boxes, list_image, xml_path)
+        else:
+            continue
+
+
+if __name__ == '__main__':
+    # 创建线程对象
+    thread1 = threading.Thread(target=main1, args=("Thread 1",))
+    # thread2 = threading.Thread(target=main2, args=("Thread 2",))
+    # thread3 = threading.Thread(target=main3, args=("Thread 3",))
+    # thread4 = threading.Thread(target=main4, args=("Thread 3",))
+
+    # 启动线程
+    thread1.start()
+    # thread2.start()
+    # thread3.start()
+    # thread4.start()
+
+    # 等待线程执行完成
+    thread1.join()
+    # thread2.join()
+    # thread3.join()
+    # thread4.join()
+
+    print("所有线程执行完毕")

@@ -49,9 +49,14 @@ def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None,classes=None):
             # else:
             #     continue
             # print(class_names[cls_id])
-            img_boxes_list.append([str(int(x0*0.9)),str(int(y0*0.9)),str(int(x1*1.1)),str(int(y1*1.1)),str(class_names[cls_id])])
-            # img_boxes_list.append([str(x0),str(y0),str(x1),str(y1),str(class_names[cls_id])])
-        # else:
+            # img_boxes_list.append([str(int(x0*0.9)),str(int(y0*0.9)),str(int(x1*1.1)),str(int(y1*1.1)),str(class_names[cls_id])])
+            img_boxes_list.append([str(int(x0)),str(int(y0)),str(int(x1)),str(int(y1)),str(class_names[cls_id])])
+            # img_boxes_list.append([str(x0-10),str(y0-10),str(x1+10),str(y1+10),str(class_names[cls_id])])
+        #     if (str(x0)-10<0 or str(y0)-10<0 or str(x1)+10>img.shape[0] or str(y1)+10>img.shape[1]):
+        #         img_boxes_list.append("")
+        #     else:
+        #         img_boxes_list.append([str(x0)-10,str(y0)-10,str(x1)+10,str(y1)+10,str(class_names[cls_id])])
+        # # else:
         #     continue
     return img,img_boxes_list
 

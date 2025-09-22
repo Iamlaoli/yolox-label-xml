@@ -22,7 +22,7 @@ def rename(img_folder):
         global num
         src = os.path.join(img_folder, img_name)   #src：要修改的目录名
         # dst = os.path.join(img_folder, "J01_" +str(num) + '.jpg') #dst： 修改后的目录名      注意此处str(num)将num转化为字符串,继而拼接
-        dst = os.path.join(img_folder, "no_phone_"+str(num)+".jpg") #dst： 修改后的目录名      注意此处str(num)将num转化为字符串,继而拼接
+        dst = os.path.join(img_folder, "annihilator_"+str(num)+".jpg") #dst： 修改后的目录名      注意此处str(num)将num转化为字符串,继而拼接
         num= num+1
         os.rename(src, dst) #用dst替代src
 
@@ -31,7 +31,7 @@ def main():
     # for i in range(1,3):
         #要修改文件名的路径
         # img_folder0 = r'F:\model\YOLOX-main\datasets\VOCdevkit\VOC2007\JPEGImages' #图片的文件夹路径    直接放你的文件夹路径即可
-    img_folder0 = r'D:\datasets\sign\JPEGImages' #图片的文件夹路径    直接放你的文件夹路径即可
+    img_folder0 = r'D:\model\pa\灭火器/' #图片的文件夹路径    直接放你的文件夹路径即可
     rename(img_folder0)
 
         # #保存图片代码
